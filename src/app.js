@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const userAuth = require('./Auth/userAuth')
 const PORT = 3000;
 
 connectDB();
@@ -67,25 +68,9 @@ catch(err){
 }
 })
 
-app.get('/profile', async(req, res)=>{
-    try{
-    const {token} = req.cookies;
-    if(!token){
-        throw new Error('Invalid token')
-    }
-
-    const data = await jwt.verify(token, 'saad@123')
-    const { id } = data;
-
-    const user = await User.findById({_id: id});
-
-    res.send(user);
-    
-}
-
-    catch(err){
-        res.status(400).send(`Error: ${err.message}`)
-    }
+app.get('/profile', userAuth, async(req, res)=>{
+    const user = req.user;
+    res.send(user)
 
 })
 
